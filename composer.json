@@ -1,0 +1,8 @@
+{
+    "name": "dima/phpspider",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "psr-4": {"Spider\\": "src/classes"}
+    }
+}

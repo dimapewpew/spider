@@ -1,0 +1,5 @@
+tests/_output/
+*.log
+/trash/
+/vendor/
+/.idea/
