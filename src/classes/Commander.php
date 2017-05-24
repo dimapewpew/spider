@@ -3,21 +3,26 @@
 namespace Spider;
 
 use Spider\Protocol\Client;
+use Spider\Protocol\ClientInterface;
 use Spider\Protocol\Request;
 
 class Commander
 {
-    private $config;
     private $client;
+
+    public static function createFromConfig($config)
+    {
+        $client = new Client($config['host'], $config['port']);
+        return new self($client);
+    }
 
     /**
      * Creates commander instance
-     * @param array $config manager's config
+     * @param ClientInterface $client spider protocol client
      */
-    public function __construct($config)
+    public function __construct(ClientInterface $client)
     {
-        $this->config = $config;
-        $this->client = new Client($config['host'], $config['port']);
+        $this->client = $client;
     }
 
     /**

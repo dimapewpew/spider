@@ -8,7 +8,7 @@ use Spider\Task;
 
 $opts = getopt('', ['add', 'status', 'clear', 'path:', 'pattern:']);
 $cli = new Cli();
-$commander = new Commander(require 'config.php');
+$commander = Commander::createFromConfig(require 'config.php');
 
 /**
  * Add task

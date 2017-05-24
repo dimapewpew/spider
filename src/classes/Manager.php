@@ -5,25 +5,36 @@ namespace Spider;
 use Spider\Protocol\Packet;
 use Spider\Protocol\Response;
 use Spider\Protocol\Server;
+use Spider\Protocol\ServerInterface;
 use Spider\Protocol\ServerHandlerInterface;
 use SplQueue;
 
 class Manager implements ServerHandlerInterface
 {
-    private $config;
     private $queue;
-    private $server;
     private $workers;
+    private $server;
+    private $launcher;
+
+    public static function createFromConfig($config)
+    {
+        $launcher = new WorkerLauncher($config['workers']);
+        $server = new Server($config['host'], $config['port']);
+        return new self($server, $launcher);
+    }
 
     /**
-     * @param array $config manager's config
+     * Manager constructor.
+     * @param ServerInterface $server
+     * @param LauncherInterface $launcher
      */
-    public function __construct($config)
+    public function __construct($server, $launcher)
     {
-        $this->config = $config;
-        $this->queue = new SplQueue();
-        $this->server = new Server($config['host'], $config['port'], $this);
         $this->workers = [];
+        $this->queue = new SplQueue();
+        $this->server = $server;
+        $this->server->setHandler($this);
+        $this->launcher = $launcher;
     }
 
     /**
@@ -143,9 +154,7 @@ class Manager implements ServerHandlerInterface
      */
     public function startWorkers()
     {
-        for ($i = 0; $i < $this->config['workers']; $i++) {
-            exec('/usr/bin/php worker.php > /dev/null 2>&1 & echo $!');
-        }
+        $this->launcher->startWorkers();
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Spider\Protocol;
 
 use Exception;
 
-class Client extends Protocol
+class Client extends Protocol implements ClientInterface
 {
     private $conn;
 
@@ -14,7 +14,7 @@ class Client extends Protocol
      * @param int $port server's port
      * @throws Exception
      */
-    function __construct($host, $port)
+    public function __construct($host, $port)
     {
         $this->conn = stream_socket_client('tcp://'.$host.':'.$port, $errno, $errstr);
         if (!$this->conn) {
@@ -23,7 +23,7 @@ class Client extends Protocol
         stream_set_timeout($this->conn, 5);
     }
 
-    function __destruct()
+    public function __destruct()
     {
         fclose($this->conn);
     }
@@ -34,7 +34,7 @@ class Client extends Protocol
      * @return Packet response packet
      * @throws Exception
      */
-    function sendRequest($request)
+    public function sendRequest(Packet $request)
     {
         $meta = stream_get_meta_data($this->conn);
         if ($meta['timed_out'] || feof($this->conn)) {

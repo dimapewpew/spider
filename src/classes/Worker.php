@@ -7,16 +7,20 @@ use Spider\Protocol\Request;
 
 class Worker
 {
-    private $config;
     private $client;
 
-    /**
-     * @param array $config manager's config
-     */
-    public function __construct($config)
+    public static function createFromConfig($config)
     {
-        $this->config = $config;
-        $this->client = new Client($config['host'], $config['port']);
+        $client = new Client($config['host'], $config['port']);
+        return new self($client);
+    }
+
+    /**
+     * @param Client $client spider protocol client
+     */
+    public function __construct($client)
+    {
+        $this->client = $client;
     }
 
     /**

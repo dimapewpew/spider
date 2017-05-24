@@ -4,7 +4,7 @@ namespace Spider\Protocol;
 
 use Exception;
 
-class Server extends Protocol
+class Server extends Protocol implements ServerInterface
 {
     private $socket;
     private $connections;
@@ -14,19 +14,18 @@ class Server extends Protocol
      * Server constructor.
      * @param string $host listening address
      * @param int $port listening port
-     * @param ServerHandlerInterface $handler
      * @throws Exception
      */
-    function __construct($host, $port, ServerHandlerInterface $handler)
+    public function __construct($host, $port)
     {
-        $this->handler = $handler;
         $this->socket = stream_socket_server('tcp://'.$host.':'.$port, $errno, $errstr);
         if (!$this->socket) {
             throw new Exception($errstr, $errno);
         }
+        $this->handler = new ServerHandler();
     }
 
-    function __destruct()
+    public function __destruct()
     {
         foreach ($this->connections as $conn)
         {
@@ -38,7 +37,7 @@ class Server extends Protocol
     /**
      * Accepts new incoming connection and calls handler's hook.
      */
-    function acceptConnections()
+    public function acceptConnections()
     {
         if (stream_select($read = [$this->socket], $write = NULL, $except = NULL, 0)) {
             $conn = stream_socket_accept($this->socket, -1);
@@ -50,7 +49,7 @@ class Server extends Protocol
     /**
      * Processes the requests from connected clients
      */
-    function processRequests()
+    public function processRequests()
     {
         if (!$this->connections) {
             return true;
@@ -74,6 +73,14 @@ class Server extends Protocol
         }
 
         return true;
+    }
+
+    /**
+     * @param ServerHandlerInterface $handler
+     */
+    public function setHandler(ServerHandlerInterface $handler)
+    {
+        $this->handler = $handler;
     }
 }
 

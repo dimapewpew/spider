@@ -5,7 +5,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use Spider\Manager;
 use Spider\ManagerDashboard;
 
-$manager = new Manager(require 'config.php');
+$manager = Manager::createFromConfig(require 'config.php');
 $manager->startWorkers();
 $dashboard = new ManagerDashboard($manager);
 
